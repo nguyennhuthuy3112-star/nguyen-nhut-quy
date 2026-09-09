@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>World Clock</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                "Noto Sans KR",
+                Arial,
+                sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #0f172a,
+                    #1e293b,
+                    #334155
+                );
+
+            color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .header h1 {
+            font-size: clamp(32px, 5vw, 56px);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #cbd5e1;
+            font-size: 16px;
+        }
+
+        .clocks {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 20px;
+        }
+
+        .clock-card {
+            background: rgba(255, 255, 255, 0.08);
+
+            border: 1px solid rgba(255, 255, 255, 0.15);
+
+            border-radius: 24px;
+
+            padding: 30px 20px;
+
+            text-align: center;
+
+            backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.25);
+
+            transition: transform 0.25s ease;
+        }
+
+        .clock-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .flag {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .country {
+            font-size: 23px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .city {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .time {
+            font-size: clamp(35px, 5vw, 55px);
+            font-weight: 700;
+
+            letter-spacing: 2px;
+
+            font-variant-numeric: tabular-nums;
+
+            margin-bottom: 12px;
+        }
+
+        .date {
+            color: #cbd5e1;
+            font-size: 15px;
+        }
+
+        .timezone {
+            margin-top: 12px;
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            border-radius: 20px;
+
+            background: rgba(255,255,255,0.08);
+
+            color: #94a3b8;
+
+            font-size: 12px;
+        }
+
+        .footer {
+            text-align: center;
+
+            margin-top: 30px;
+
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+        @media (max-width: 800px) {
+
+            .clocks {
+                grid-template-columns: 1fr;
+            }
+
+            .clock-card {
+                padding: 25px 15px;
+            }
+
+            .time {
+                font-size: 45px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🌍 World Clock</h1>
+        <p>한국 · 베트남 · 뉴욕</p>
+    </div>
+
+
+    <div class="clocks">
+
+        <!-- KOREA -->
+        <div class="clock-card">
+
+            <div class="flag">🇰🇷</div>
+
+            <div class="country">
+                대한민국
+            </div>
+
+            <div class="city">
+                서울 · Seoul
+            </div>
+
+            <div
+                class="time"
+                id="korea-time">
+                --:--:--
+            </div>
+
+            <div
+                class="date"
+                id="korea-date">
+                ----
+            </div>
+
+            <div class="timezone">
+                KST · UTC+9
+            </div>
+
+        </div>
+
+
+        <!-- VIETNAM -->
+        <div class="clock-card">
+
+            <div class="flag">🇻🇳</div>
+
+            <div class="country">
+                베트남
+            </div>
+
+            <div class="city">
+                호치민 · Ho Chi Minh
+            </div>
+
+            <div
+                class="time"
+                id="vietnam-time">
+                --:--:--
+            </div>
+
+            <div
+                class="date"
+                id="vietnam-date">
+                ----
+            </div>
+
+            <div class="timezone">
+                ICT · UTC+7
+            </div>
+
+        </div>
+
+
+        <!-- NEW YORK -->
+        <div class="clock-card">
+
+            <div class="flag">🇺🇸</div>
+
+            <div class="country">
+                미국
+            </div>
+
+            <div class="city">
+                뉴욕 · New York
+            </div>
+
+            <div
+                class="time"
+                id="newyork-time">
+                --:--:--
+            </div>
+
+            <div
+                class="date"
+                id="newyork-date">
+                ----
+            </div>
+
+            <div class="timezone">
+                America/New_York
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+        실시간 세계 시계 · Real-time World Clock
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+     * 각 도시의 시간대 설정
+     */
+
+    const cities = {
+
+        korea: {
+            timeZone: "Asia/Seoul",
+            locale: "ko-KR"
+        },
+
+        vietnam: {
+            timeZone: "Asia/Ho_Chi_Minh",
+            locale: "vi-VN"
+        },
+
+        newyork: {
+            timeZone: "America/New_York",
+            locale: "en-US"
+        }
+
+    };
+
+
+    /*
+     * 시간을 업데이트하는 함수
+     */
+
+    function updateClock() {
+
+        const now = new Date();
+
+
+        /*
+         * 한국
+         */
+
+        const koreaTime =
+            new Intl.DateTimeFormat(
+                cities.korea.locale,
+                {
+                    timeZone: cities.korea.timeZone,
+
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+
+                    hour12: false
+                }
+            ).format(now);
+
+
+        const koreaDate =
+            new Intl.DateTimeFormat(
+                cities.korea.locale,
+                {
+                    timeZone: cities.korea.timeZone,
+
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long"
+                }
+            ).format(now);
+
+
+        document.getElementById(
+            "korea-time"
+        ).textContent = koreaTime;
+
+
+        document.getElementById(
+            "korea-date"
+        ).textContent = koreaDate;
+
+
+
+        /*
+         * 베트남
+         */
+
+        const vietnamTime =
+            new Intl.DateTimeFormat(
+                cities.vietnam.locale,
+                {
+                    timeZone: cities.vietnam.timeZone,
+
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+
+                    hour12: false
+                }
+            ).format(now);
+
+
+        const vietnamDate =
+            new Intl.DateTimeFormat(
+                cities.vietnam.locale,
+                {
+                    timeZone: cities.vietnam.timeZone,
+
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long"
+                }
+            ).format(now);
+
+
+        document.getElementById(
+            "vietnam-time"
+        ).textContent = vietnamTime;
+
+
+        document.getElementById(
+            "vietnam-date"
+        ).textContent = vietnamDate;
+
+
+
+        /*
+         * 뉴욕
+         */
+
+        const newyorkTime =
+            new Intl.DateTimeFormat(
+                cities.newyork.locale,
+                {
+                    timeZone: cities.newyork.timeZone,
+
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+
+                    hour12: false
+                }
+            ).format(now);
+
+
+        const newyorkDate =
+            new Intl.DateTimeFormat(
+                cities.newyork.locale,
+                {
+                    timeZone: cities.newyork.timeZone,
+
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                    weekday: "long"
+                }
+            ).format(now);
+
+
+        document.getElementById(
+            "newyork-time"
+        ).textContent = newyorkTime;
+
+
+        document.getElementById(
+            "newyork-date"
+        ).textContent = newyorkDate;
+
+    }
+
+
+    /*
+     * 처음 실행
+     */
+
+    updateClock();
+
+
+    /*
+     * 1초마다 업데이트
+     */
+
+    setInterval(
+        updateClock,
+        1000
+    );
+
+</script>
+
+</body>
+</html>
